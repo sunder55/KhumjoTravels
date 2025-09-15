@@ -22,6 +22,25 @@ class Kt_meta_fields
     public function kt_meta_fields_callback()
     {
 ?>
+        <div>
+            <h4>Min no of travelers</h4>
+            <div>
+                <input type="number" name="kt_min_travelers" id="kt_min_travelers" class="widefat" min="1" max="100" value="<?php echo get_post_meta(get_the_ID(), 'kt_min_travelers', true) ?: ''; ?>">
+            </div>
+        </div>
+        <div>
+            <h4>Max no of travelers</h4>
+            <div>
+                <input type="number" name="kt_max_travelers" id="kt_max_travelers" class="widefat" min="1" max="100" value="<?php echo get_post_meta(get_the_ID(), 'kt_max_travelers', true) ?: ''; ?>">
+            </div>
+        </div>
+
+        <div>
+            <h4>Ages</h4>
+            <div>
+                <input type="text" name="kt_ages" id="kt_ages" class="widefat" placeholder="0-50" value="<?php echo get_post_meta(get_the_ID(), 'kt_ages', true) ?: ''; ?>">
+            </div>
+        </div>
         <!-- Inclusion section-->
         <div class="">
             <h4>
@@ -32,15 +51,15 @@ class Kt_meta_fields
                 <textarea name="kt_inclusion_fields" id="kt_trip_inclusions" class="widefat" placeholder="example1, example2"><?php echo get_post_meta(get_the_ID(), 'kt_inclusion_fields', true) ?: ''; ?></textarea>
             </div>
         </div>
-        <div class="">
+        <!-- <div class="">
             <h4>
                 <label for="kt_trip_inclusions">Exclusions</label>
-            </h4>
-            <!-- repeater field for inclusion -->
-            <div class="widefat">
+            </h4> -->
+        <!-- repeater field for inclusion -->
+        <!-- <div class="widefat">
                 <textarea name="kt_exclusion_fields" id="kt_exclusion_fields" class="widefat" placeholder="example1, example2"><?php echo get_post_meta(get_the_ID(), 'kt_exclusion_fields', true) ?: ''; ?></textarea>
             </div>
-        </div>
+        </div> -->
 
         <div class="">
             <h4>
@@ -49,6 +68,12 @@ class Kt_meta_fields
             <!-- repeater field for inclusion -->
             <div class="widefat">
                 <input type="number" name="kt_no_of_days" id="kt_no_of_days" class="widefat" min="1" max="100" value="<?php echo get_post_meta(get_the_ID(), 'kt_no_of_days', true) ?: ''; ?>">
+            </div>
+        </div>
+        <div>
+            <h4>Tour Hightlights</h4>
+            <div>
+                <textarea name="kt_tour_highlights" id="kt_tour_highlights" class="widefat" placeholder="example1, example2"><?php echo get_post_meta(get_the_ID(), 'kt_tour_highlights', true) ?: ''; ?> </textarea>
             </div>
         </div>
 <?php
@@ -70,6 +95,18 @@ class Kt_meta_fields
         }
         if (isset($_POST['kt_no_of_days'])) {
             update_post_meta($post_id, 'kt_no_of_days', $_POST['kt_no_of_days']);
+        }
+        if (isset($_POST['kt_tour_highlights'])) {
+            update_post_meta($post_id, 'kt_tour_highlights', $_POST['kt_tour_highlights']);
+        }
+        if (isset($_POST['kt_min_travelers'])) {
+            update_post_meta($post_id, 'kt_min_travelers', $_POST['kt_min_travelers']);
+        }
+        if (isset($_POST['kt_max_travelers'])) {
+            update_post_meta($post_id, 'kt_max_travelers', $_POST['kt_max_travelers']);
+        }
+        if (isset($_POST['kt_ages'])) {
+            update_post_meta($post_id, 'kt_ages', $_POST['kt_ages']);
         }
     }
 }

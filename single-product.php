@@ -50,7 +50,7 @@ $featured_img_url = get_the_post_thumbnail_url(get_the_ID(), 'full');
                         </svg>
                         <div>
                             <p class="font-medium">Duration</p>
-                            <p class="text-sm text-muted-foreground"><?php echo get_post_meta(get_the_ID(), 'kt_no_of_days', true); ?> days</p>
+                            <p class="text-sm text-muted-foreground"><?php echo get_post_meta(get_the_ID(), 'kt_no_of_days', true) ?: 0; ?> days</p>
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
@@ -258,3 +258,7 @@ $featured_img_url = get_the_post_thumbnail_url(get_the_ID(), 'full');
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
+<?php get_footer(); ?>

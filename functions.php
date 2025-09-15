@@ -8,3 +8,25 @@ function kt_enqueue_scripts()
 
 include get_template_directory() . '/includes/kt-post-types.php';
 include get_template_directory() . '/includes/kt-meta-fields.php';
+
+
+
+// Add Tailwind classes to wp_nav_menu links
+// function khumjo_nav_menu_link_classes($atts, $item, $args)
+// {
+//     if ($args->theme_location === 'primary') {
+//         $atts['class'] = 'text-foreground hover:text-primary transition-colors';
+//     }
+//     return $atts;
+// }
+// add_filter('nav_menu_link_attributes', 'khumjo_nav_menu_link_classes', 10, 3);
+
+// // Add active class to current menu item
+// function khumjo_nav_menu_active_class($classes, $item, $args)
+// {
+//     if ($args->theme_location === 'primary' && in_array('current-menu-item', $classes)) {
+//         $classes[] = 'text-primary font-medium';
+//     }
+//     return $classes;
+// }
+// add_filter('nav_menu_css_class', 'khumjo_nav_menu_active_class', 10, 3);

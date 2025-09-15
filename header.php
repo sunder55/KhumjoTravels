@@ -7,7 +7,7 @@
     <title>Khumjo Travels - Discover Your Next Adventure</title>
     <meta name="description" content="Explore breathtaking destinations with expert guides and unforgettable experiences. Book your dream adventure with Khumjo Travels - your trusted partner for extraordinary journeys." />
     <meta name="author" content="Khumjo Travels" />
-
+    <!-- 
     <meta property="og:title" content="Khumjo Travels - Discover Your Next Adventure" />
     <meta property="og:description" content="Explore breathtaking destinations with expert guides and unforgettable experiences. Book your dream adventure with Khumjo Travels." />
     <meta property="og:type" content="website" />
@@ -15,7 +15,7 @@
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@khumjotravels" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" /> -->
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -55,6 +55,16 @@
                 }
             }
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const btn = document.getElementById('mobileMenuButton');
+            const menu = document.getElementById('mobileMenu');
+
+            btn.addEventListener('click', () => {
+                console.log('clicked');
+                menu.classList.toggle('hidden');
+            });
+        });
     </script>
 </head>
 
@@ -64,7 +74,7 @@
         <div class="container mx-auto px-4">
             <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
-                <a href="index.html" class="flex items-center gap-2 font-bold text-xl">
+                <a href="<?php echo home_url(); ?>" class="flex items-center gap-2 font-bold text-xl">
                     <div class="p-2 bg-hero-gradient rounded-lg">
                         <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
@@ -77,21 +87,49 @@
 
                 <!-- Desktop Navigation -->
                 <div class="hidden md:flex items-center gap-8">
-                    <a href="index.html" class="text-primary font-medium">Home</a>
+                    <!-- <a href="index.html" class="text-primary font-medium">Home</a>
                     <a href="destinations.html" class="text-foreground hover:text-primary transition-colors">Destinations</a>
                     <a href="about.html" class="text-foreground hover:text-primary transition-colors">About</a>
-                    <a href="contact.html" class="text-foreground hover:text-primary transition-colors">Contact</a>
+                    <a href="contact.html" class="text-foreground hover:text-primary transition-colors">Contact</a> -->
+                    <?php
+                    wp_nav_menu(array(
+                        'theme_location' => 'primary',
+                        'container' => false,
+                        'menu_class' => 'hidden md:flex items-center gap-8',
+                        'fallback_cb' => false,
+                        'menu' => 'Primary Menu'
+
+                    ));
+                    ?>
+                    <button class="hidden md:inline-block bg-hero-gradient text-white px-6 py-2 rounded-md hover:opacity-90 transition-opacity">
+                        Book Now
+                    </button>
+
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden p-2 border border-border rounded-md" id="mobileMenuButton">
+                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+
+
+                <div id="mobileMenu" class="md:hidden hidden flex flex-col gap-4 mt-2 p-4 bg-background border-t border-border">
+                    <?php
+                    wp_nav_menu(array(
+                        'theme_location' => 'primary',
+                        'container' => false,
+                        'menu_class' => 'flex flex-col gap-4',
+                        'fallback_cb' => false,
+                        'menu' => 'Primary Menu'
+                    ));
+                    ?>
                     <button class="bg-hero-gradient text-white px-6 py-2 rounded-md hover:opacity-90 transition-opacity">
                         Book Now
                     </button>
                 </div>
 
-                <!-- Mobile Menu Button -->
-                <button class="md:hidden p-2 border border-border rounded-md">
-                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                    </svg>
-                </button>
             </div>
         </div>
     </nav>

@@ -1,3 +1,8 @@
+  <?php
+    /* Template Name: Contact Template  */
+
+    get_header();
+    ?>
   <!-- Hero Section -->
   <section class="bg-hero-gradient py-20">
       <div class="container mx-auto px-4 text-center">
@@ -93,3 +98,5 @@
           </div>
       </div>
   </div>
+
+  <?php get_footer(); ?>

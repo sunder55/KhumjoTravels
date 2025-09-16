@@ -1,5 +1,5 @@
 <?php
-/* Template Name: Shop Template  */
+/* Template Name: Trips Template  */
 
 get_header();
 ?>
@@ -205,7 +205,7 @@ $tours_found = $products->found_posts;
                                     </div>
                                     <span class="text-sm text-muted-foreground">per person</span>
                                 </div>
-                                <a href="tour-details.html" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
+                                <a href="<?php the_permalink(); ?>" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
                                     View Details
                                 </a>
                             </div>

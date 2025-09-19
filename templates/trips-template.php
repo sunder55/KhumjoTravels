@@ -135,6 +135,10 @@ $tours_found = $products->found_posts;
                     $product_thumbnail_id = get_post_thumbnail_id();
                     $product_thumbnail_url = wp_get_attachment_url($product_thumbnail_id);
 
+                    // check if product category is featured 
+                    $product_categories = wp_get_post_terms(get_the_ID(), 'product_cat', array('fields' => 'slugs'));
+                    $is_featured = in_array('featured', $product_categories);
+
             ?>
 
                     <div class="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-primary transition-all duration-300 hover:-translate-y-1">
@@ -143,9 +147,11 @@ $tours_found = $products->found_posts;
                                 src="<?php echo $product_thumbnail_url; ?>"
                                 alt="<?php the_title(); ?>"
                                 class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300" />
-                            <span class="absolute top-3 left-3 bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm">
-                                Featured
-                            </span>
+                            <?php if ($is_featured) : ?>
+                                <span class="absolute top-3 left-3 bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm">
+                                    Featured
+                                </span>
+                            <?php endif; ?>
                             <?php if ($discount_price > 0) : ?>
                                 <span class="absolute top-3 right-3 bg-destructive text-destructive-foreground px-2 py-1 rounded text-sm">
                                     Save <?php echo $currency . $discount_price; ?>
@@ -155,13 +161,13 @@ $tours_found = $products->found_posts;
                         </div>
 
                         <div class="p-4">
-                            <div class="flex items-center gap-1 mb-2">
+                            <!-- <div class="flex items-center gap-1 mb-2">
                                 <svg class="h-4 w-4 fill-secondary text-secondary" viewBox="0 0 24 24">
                                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                                 </svg>
                                 <span class="text-sm font-medium">4.8</span>
                                 <span class="text-sm text-muted-foreground">(124 reviews)</span>
-                            </div>
+                            </div> -->
 
                             <h3 class="font-semibold text-lg mb-2"><?php the_title(); ?></h3>
 
@@ -170,7 +176,7 @@ $tours_found = $products->found_posts;
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     </svg>
-                                    <span>Nepal, Himalayas</span>
+                                    <span><?php echo get_post_meta(get_the_ID(), 'kt_location', true) ?: ''; ?></span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -206,7 +212,7 @@ $tours_found = $products->found_posts;
                                     <span class="text-sm text-muted-foreground">per person</span>
                                 </div>
                                 <a href="<?php the_permalink(); ?>" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
-                                    View Details
+                                    View
                                 </a>
                             </div>
                         </div>

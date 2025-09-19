@@ -1,10 +1,14 @@
-<?php get_header();
+<?php
+if (! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
+}
+get_header();
 ?>
 <!-- Hero Section -->
 <section class="relative h-screen flex items-center justify-center">
     <div
         class="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style="background-image: url('src/assets/hero-mountains.jpg')">
+        style="background-image: url('<?php echo get_template_directory_uri(); ?>/assets/images/hero-bg.jpg')">
         <div class="absolute inset-0 bg-black/40"></div>
     </div>
 
@@ -21,23 +25,31 @@
 
         <!-- Search Bar -->
         <div class="bg-white/95 backdrop-blur rounded-2xl p-6 shadow-2xl max-w-2xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <?php
+            if (isset($_POST['search']) || isset($_POST['price_range'])) {
+                $search = sanitize_text_field($_POST['search']);
+                echo '<script>window.location.href = "/trips/?search=' . urlencode($search) . ' &price_range=' . urlencode($_POST['price_range']) . '";</script>';
+            }
+            ?>
+
+            <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div class="relative">
                     <input
                         type="text"
-                        placeholder="Where to?"
-                        class="w-full pl-10 pr-3 py-2 border border-input rounded-md" />
+                        placeholder="Search destinations?"
+                        class="w-full pl-10 pr-3 py-2 border border-input rounded-md"
+                        name="search" />
                     <svg class="absolute left-3 top-3 h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                 </div>
-                <select class="w-full px-3 py-2 border border-input rounded-md">
-                    <option>Duration</option>
-                    <option>1-3 days</option>
-                    <option>4-7 days</option>
-                    <option>8-14 days</option>
-                    <option>15+ days</option>
+                <select class="w-full px-3 py-2 border border-input rounded-md text-foreground" name="price_range">
+                    <option value="">All Prices</option>
+                    <option value="0-1000">Under Rs.1,000</option>
+                    <option value="1000-2000">Rs.1,000 - Rs.2,000</option>
+                    <option value="2000-3000">Rs.2,000 - Rs.3,000</option>
+                    <option value="3000+">Rs.3,000+</option>
                 </select>
                 <button class="bg-hero-gradient text-white px-6 py-2 rounded-md hover:opacity-90 transition-opacity flex items-center justify-center gap-2">
                     <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -45,11 +57,29 @@
                     </svg>
                     Search Tours
                 </button>
-            </div>
+            </form>
+
         </div>
     </div>
 </section>
+<?php
+// get products having category featured
+$featured_products = new WP_Query(array(
+    'post_type' => 'product',
+    'posts_per_page' => 4,
+    'tax_query' => array(
+        array(
+            'taxonomy' => 'product_cat',
+            'field' => 'slug',
+            'terms' => 'featured',
+            'operator' => 'IN'
+        )
+    ),
+    'orderby' => 'rand'
+));
 
+
+?>
 <!-- Featured Tours -->
 <section class="py-20 bg-muted/30">
     <div class="container mx-auto px-4">
@@ -60,228 +90,99 @@
             </p>
         </div>
 
+
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <!-- Tour Card 1 -->
-            <div class="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-primary transition-all duration-300 hover:-translate-y-1">
-                <div class="relative overflow-hidden">
-                    <img
-                        src="src/assets/hero-mountains.jpg"
-                        alt="Himalayan Mountain Adventure"
-                        class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300" />
-                    <span class="absolute top-3 left-3 bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm">
-                        Featured
-                    </span>
-                    <span class="absolute top-3 right-3 bg-destructive text-destructive-foreground px-2 py-1 rounded text-sm">
-                        Save $500
-                    </span>
-                </div>
+            <?php
+            if ($featured_products->have_posts()):
+                while ($featured_products->have_posts()): $featured_products->the_post();
+                    $product = wc_get_product(get_the_ID());
+                    $price = $product->get_price();
+                    $regular_price = $product->get_regular_price();
+                    $discount_price = $regular_price - $price;
 
-                <div class="p-4">
-                    <div class="flex items-center gap-1 mb-2">
-                        <svg class="h-4 w-4 fill-secondary text-secondary" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                        </svg>
-                        <span class="text-sm font-medium">4.8</span>
-                        <span class="text-sm text-muted-foreground">(124 reviews)</span>
-                    </div>
+                    $featured_image_url = has_post_thumbnail() ? get_the_post_thumbnail_url(get_the_ID(), 'large') : '';
 
-                    <h3 class="font-semibold text-lg mb-2">Himalayan Mountain Adventure</h3>
-
-                    <div class="space-y-2 text-sm text-muted-foreground mb-4">
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
-                            <span>Nepal, Himalayas</span>
+            ?>
+                    <div class="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-primary transition-all duration-300 hover:-translate-y-1">
+                        <div class="relative overflow-hidden">
+                            <img
+                                src="<?php echo $featured_image_url; ?>"
+                                alt="<?php the_title(); ?>"
+                                class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300" />
+                            <!-- <span class="absolute top-3 left-3 bg-secondary text-secondary-foreground px-2 py-1 rounded text-sm">
+                                Featured
+                            </span> -->
+                            <?php if ($discount_price > 0): ?>
+                                <span class="absolute top-3 right-3 bg-destructive text-destructive-foreground px-2 py-1 rounded text-sm">
+                                    Save <?php echo  wc_price($discount_price); ?>
+                                </span>
+                            <?php endif; ?>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>14 days</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                            </svg>
-                            <span>8-12 people</span>
-                        </div>
-                    </div>
 
-                    <div class="flex items-center justify-between">
-                        <div class="flex flex-col">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl font-bold text-primary">$2,499</span>
-                                <span class="text-sm text-muted-foreground line-through">$2,999</span>
+                        <div class="p-4">
+                            <div class="flex items-center gap-1 mb-2">
+                                <svg class="h-4 w-4 fill-secondary text-secondary" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                                </svg>
+                                <span class="text-sm font-medium">4.8</span>
+                                <span class="text-sm text-muted-foreground">(124 reviews)</span>
                             </div>
-                            <span class="text-sm text-muted-foreground">per person</span>
-                        </div>
-                        <a href="tour-details.html" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
-                            View Details
-                        </a>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Repeat similar cards for other tours -->
-            <!-- Tour Card 2 -->
-            <div class="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-primary transition-all duration-300 hover:-translate-y-1">
-                <div class="relative overflow-hidden">
-                    <img
-                        src="src/assets/tropical-beach.jpg"
-                        alt="Tropical Paradise Getaway"
-                        class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300" />
-                </div>
+                            <h3 class="font-semibold text-lg mb-2"><?php the_title(); ?></h3>
 
-                <div class="p-4">
-                    <div class="flex items-center gap-1 mb-2">
-                        <svg class="h-4 w-4 fill-secondary text-secondary" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                        </svg>
-                        <span class="text-sm font-medium">4.9</span>
-                        <span class="text-sm text-muted-foreground">(89 reviews)</span>
-                    </div>
+                            <div class="space-y-2 text-sm text-muted-foreground mb-4">
+                                <div class="flex items-center gap-2">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                    </svg>
+                                    <span><?php echo get_post_meta(get_the_ID(), 'kt_location', true) ?: ''; ?></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <span><?php echo get_post_meta(get_the_ID(), 'kt_no_of_days', true) ?: 0; ?> days</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
+                                    </svg>
+                                    <?php
+                                    $min_travelers = get_post_meta(get_the_ID(), 'kt_min_travelers', true) ?: '';
+                                    $max_travelers = get_post_meta(get_the_ID(), 'kt_max_travelers', true) ?: '';
 
-                    <h3 class="font-semibold text-lg mb-2">Tropical Paradise Getaway</h3>
+                                    if ($min_travelers && $max_travelers) {
+                                        echo '<span>' . $min_travelers . '-' . $max_travelers . 'people</span>';
+                                    } else if ($min_travelers) {
+                                        echo '<span>' . $min_travelers . 'people</p>';
+                                    } else {
+                                        echo '<span>' . $max_travelers . 'people</p>';
+                                    }
+                                    ?>
+                                </div>
+                            </div>
 
-                    <div class="space-y-2 text-sm text-muted-foreground mb-4">
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
-                            <span>Maldives</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>7 days</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                            </svg>
-                            <span>2-6 people</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex flex-col">
-                            <span class="text-2xl font-bold text-primary">$1,899</span>
-                            <span class="text-sm text-muted-foreground">per person</span>
-                        </div>
-                        <a href="tour-details.html" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
-                            View Details
-                        </a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tour Card 3 -->
-            <div class="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-primary transition-all duration-300 hover:-translate-y-1">
-                <div class="relative overflow-hidden">
-                    <img
-                        src="src/assets/ancient-temple.jpg"
-                        alt="Ancient Temples & Culture"
-                        class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300" />
-                </div>
-
-                <div class="p-4">
-                    <div class="flex items-center gap-1 mb-2">
-                        <svg class="h-4 w-4 fill-secondary text-secondary" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                        </svg>
-                        <span class="text-sm font-medium">4.7</span>
-                        <span class="text-sm text-muted-foreground">(156 reviews)</span>
-                    </div>
-
-                    <h3 class="font-semibold text-lg mb-2">Ancient Temples & Culture</h3>
-
-                    <div class="space-y-2 text-sm text-muted-foreground mb-4">
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
-                            <span>Cambodia</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>10 days</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                            </svg>
-                            <span>6-15 people</span>
+                            <div class="flex items-center justify-between">
+                                <div class="flex flex-col">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-2xl font-bold text-primary"><?php echo  $price ? wc_price($price) :  ''; ?></span>
+                                        <span class="text-sm text-muted-foreground line-through"><?php echo $discount_price > 0 ? wc_price($regular_price) : ''; ?></span>
+                                    </div>
+                                    <span class="text-sm text-muted-foreground">per person</span>
+                                </div>
+                                <a href="<?php echo get_permalink(get_the_ID()); ?>" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
+                                    View
+                                </a>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between">
-                        <div class="flex flex-col">
-                            <span class="text-2xl font-bold text-primary">$1,299</span>
-                            <span class="text-sm text-muted-foreground">per person</span>
-                        </div>
-                        <a href="tour-details.html" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
-                            View Details
-                        </a>
-                    </div>
-                </div>
-            </div>
+            <?php
+                endwhile;
+            endif;
+            ?>
 
-            <!-- Tour Card 4 -->
-            <div class="bg-card rounded-lg overflow-hidden shadow-md hover:shadow-primary transition-all duration-300 hover:-translate-y-1">
-                <div class="relative overflow-hidden">
-                    <img
-                        src="src/assets/city-skyline.jpg"
-                        alt="Modern Cities & Nightlife"
-                        class="w-full h-48 object-cover hover:scale-105 transition-transform duration-300" />
-                </div>
-
-                <div class="p-4">
-                    <div class="flex items-center gap-1 mb-2">
-                        <svg class="h-4 w-4 fill-secondary text-secondary" viewBox="0 0 24 24">
-                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                        </svg>
-                        <span class="text-sm font-medium">4.6</span>
-                        <span class="text-sm text-muted-foreground">(203 reviews)</span>
-                    </div>
-
-                    <h3 class="font-semibold text-lg mb-2">Modern Cities & Nightlife</h3>
-
-                    <div class="space-y-2 text-sm text-muted-foreground mb-4">
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            </svg>
-                            <span>Japan</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>12 days</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" />
-                            </svg>
-                            <span>4-10 people</span>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <div class="flex flex-col">
-                            <span class="text-2xl font-bold text-primary">$3,299</span>
-                            <span class="text-sm text-muted-foreground">per person</span>
-                        </div>
-                        <a href="tour-details.html" class="bg-primary text-primary-foreground px-4 py-2 rounded-md hover:opacity-90 transition-opacity">
-                            View Details
-                        </a>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </section>

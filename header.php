@@ -1,3 +1,6 @@
+<?php
+if (!defined('ABSPATH')) exit;
+?>
 <!doctype html>
 <html lang="en">
 
@@ -61,11 +64,12 @@
             const menu = document.getElementById('mobileMenu');
 
             btn.addEventListener('click', () => {
-                console.log('clicked');
+                // console.log('clicked');
                 menu.classList.toggle('hidden');
             });
         });
     </script>
+    <?php wp_head(); ?>
 </head>
 
 <body class="bg-background text-foreground">
@@ -115,19 +119,25 @@
                 </button>
 
 
-                <div id="mobileMenu" class="md:hidden hidden flex flex-col gap-4 mt-2 p-4 bg-background border-t border-border">
-                    <?php
-                    wp_nav_menu(array(
-                        'theme_location' => 'primary',
-                        'container' => false,
-                        'menu_class' => 'flex flex-col gap-4',
-                        'fallback_cb' => false,
-                        'menu' => 'Primary Menu'
-                    ));
-                    ?>
-                    <button class="bg-hero-gradient text-white px-6 py-2 rounded-md hover:opacity-90 transition-opacity">
-                        Book Now
-                    </button>
+
+
+                <div id="mobileMenu" class="hidden md:hidden absolute top-16 left-0 w-full bg-background shadow-lg border-t border-border z-40">
+                    <div class="px-4 py-6 space-y-4">
+                        <?php
+                        wp_nav_menu(array(
+                            'theme_location' => 'primary',
+                            'container' => false,
+                            'menu_class' => 'flex flex-col space-y-4',
+                            'fallback_cb' => false,
+                            'menu' => 'Primary Menu'
+                        ));
+                        ?>
+                        <div class="pt-4 border-t border-border">
+                            <button class="w-full bg-hero-gradient text-white px-6 py-2 rounded-md hover:opacity-90 transition-opacity">
+                                Book Now
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
             </div>

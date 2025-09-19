@@ -13,6 +13,39 @@
       </div>
   </section>
 
+  <?php if (isset($_GET['contact']) && $_GET['contact'] === 'success') : ?>
+      <div class="p-4 bg-green-100 text-green-800 rounded-md ">
+          Thank you! Your message has been sent.
+      </div>
+  <?php endif; ?>
+
+  <!-- error message  -->
+
+  <?php switch (isset($_GET['contact']) && $_GET['contact'] && $_GET['contact'] !== 'success') {
+        case 'error':
+            $message = 'Please fill in all the required fields.';
+            break;
+        case 'error_length':
+            $message = 'Please fill in all the required fields.';
+            break;
+        case 'error_message_length':
+            $message = 'Please fill in all the required fields.';
+            break;
+        case 'error_email':
+            $message = 'Please fill in all the required fields.';
+            break;
+        case 'error_phone':
+            $message = 'Please fill in all the required fields.';
+            break;
+    }
+
+    if (isset($message) && $message): ?>
+      <div class="p-4 bg-red-100 text-red-800 rounded-md">
+          <?php echo $message; ?>
+      </div>
+  <?php endif; ?>
+
+
   <div class="container mx-auto px-4 py-16">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <!-- Contact Form -->
@@ -21,33 +54,38 @@
                   <h2 class="text-2xl font-bold mb-4">Send Us a Message</h2>
                   <p class="text-muted-foreground mb-6">Fill out the form below and we'll get back to you within 24 hours.</p>
 
-                  <form class="space-y-6">
+                  <form class="space-y-6" method="post">
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                               <label class="block text-sm font-medium mb-2">First Name</label>
-                              <input type="text" class="w-full px-3 py-2 border border-border rounded-md" placeholder="John" />
+                              <input type="text" class="w-full px-3 py-2 border border-border rounded-md" name="contact_first_name" placeholder="John" />
                           </div>
                           <div>
                               <label class="block text-sm font-medium mb-2">Last Name</label>
-                              <input type="text" class="w-full px-3 py-2 border border-border rounded-md" placeholder="Doe" />
+                              <input type="text" class="w-full px-3 py-2 border border-border rounded-md" placeholder="Doe" name="contact_last_name" />
                           </div>
                       </div>
 
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
                               <label class="block text-sm font-medium mb-2">Email</label>
-                              <input type="email" class="w-full px-3 py-2 border border-border rounded-md" placeholder="john@example.com" />
+                              <input type="email" class="w-full px-3 py-2 border border-border rounded-md" placeholder="john@example.com" name="contact_email" required />
                           </div>
                           <div>
                               <label class="block text-sm font-medium mb-2">Phone</label>
-                              <input type="tel" class="w-full px-3 py-2 border border-border rounded-md" placeholder="+1 (555) 123-4567" />
+                              <input type="tel" class="w-full px-3 py-2 border border-border rounded-md" placeholder="+1 (555) 123-4567" name="contact_phone" />
                           </div>
                       </div>
 
                       <div>
                           <label class="block text-sm font-medium mb-2">Message</label>
-                          <textarea rows="6" class="w-full px-3 py-2 border border-border rounded-md" placeholder="Tell us about your dream trip..."></textarea>
+                          <textarea rows="6" class="w-full px-3 py-2 border border-border rounded-md" placeholder="Tell us about your dream trip..." name="contact_message" required></textarea>
                       </div>
+                      <!-- Honeypot field (hidden from real users) -->
+                      <input type="text" name="contact_honeypot" style="display:none" tabindex="-1" autocomplete="off" />
+
+                      <!-- reCAPTCHA token -->
+                      <!-- <div class="g-recaptcha" data-sitekey="6Lemd80rAAAAAJa8p8yBCbh363_3Nddm-3yR69xe"></div> -->
 
                       <button type="submit" class="w-full bg-hero-gradient text-white py-3 rounded-md hover:opacity-90 transition-opacity">
                           Send Message

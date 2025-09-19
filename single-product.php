@@ -1,4 +1,7 @@
-<?php get_header();
+<?php
+if (!defined('ABSPATH')) exit;
+get_header();
+
 $product = wc_get_product(get_the_ID());
 $featured_img_url = get_the_post_thumbnail_url(get_the_ID(), 'full');
 ?>
@@ -10,24 +13,24 @@ $featured_img_url = get_the_post_thumbnail_url(get_the_ID(), 'full');
         class="w-full h-full object-cover" />
     <div class="absolute inset-0 bg-black/30"></div>
     <div class="absolute bottom-6 left-6 text-white">
-        <div class="flex items-center gap-2 mb-2">
-            <span class="bg-secondary text-secondary-foreground px-3 py-1 rounded text-sm">
+        <!-- <div class="flex items-center gap-2 mb-2"> -->
+        <!-- <span class="bg-secondary text-secondary-foreground px-3 py-1 rounded text-sm">
                 Featured Tour
-            </span>
-            <div class="flex items-center gap-1">
+            </span> -->
+        <!-- <div class="flex items-center gap-1">
                 <svg class="h-4 w-4 fill-secondary text-secondary" viewBox="0 0 24 24">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
                 </svg>
                 <span class="font-medium">4.8</span>
                 <span class="text-white/80">(124 reviews)</span>
-            </div>
-        </div>
+            </div> -->
+        <!-- </div> -->
         <h1 class="text-4xl md:text-5xl font-bold mb-2"><?php echo $product->get_title(); ?></h1>
         <div class="flex items-center gap-2 text-lg">
             <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
-            <span>Nepal, Himalayas</span>
+            <span><?php echo get_post_meta(get_the_ID(), 'kt_location', true) ?: ''; ?></span>
         </div>
     </div>
 </div>
@@ -232,12 +235,12 @@ $featured_img_url = get_the_post_thumbnail_url(get_the_ID(), 'full');
                 </div>
 
                 <div class="space-y-4">
-                    <a href="booking.html" class="block w-full bg-hero-gradient text-white text-center py-3 rounded-md hover:opacity-90 transition-opacity font-semibold">
+                    <button onclick="openBookingModal()" class="block w-full bg-hero-gradient text-white text-center py-3 rounded-md hover:opacity-90 transition-opacity font-semibold">
                         Book This Tour
-                    </a>
-                    <button class="w-full border border-border text-foreground py-3 rounded-md hover:bg-muted transition-colors">
-                        Add to Wishlist
                     </button>
+                    <!-- <button class="w-full border border-border text-foreground py-3 rounded-md hover:bg-muted transition-colors">
+                        Add to Wishlist
+                    </button> -->
 
                     <div class="border-t pt-4">
                         <div class="text-center">
@@ -261,4 +264,97 @@ $featured_img_url = get_the_post_thumbnail_url(get_the_ID(), 'full');
         </div>
     </div>
 </div>
+<div id="bookingModal" class="fixed inset-0 bg-black/50 hidden items-center justify-center z-50">
+    <div class="bg-card rounded-lg p-6 shadow-xl max-w-md w-full mx-4">
+        <!-- success message  -->
+        <div id="bookingSuccess" class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative hidden" role="alert">
+        </div>
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold">Book <?php echo $product->get_title(); ?></h3>
+            <button onclick="closeBookingModal()" class="text-muted-foreground hover:text-foreground">
+                <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="bookingForm" class="space-y-4">
+            <?php wp_nonce_field('create_booking_nonce', 'booking_nonce'); ?>
+            <input type="hidden" name="product_id" value="<?php echo get_the_ID(); ?>">
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Full Name</label>
+                <input type="text" name="customer_name" required class="w-full px-3 py-2 border border-input rounded-md" required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Email</label>
+                <input type="email" name="customer_email" required class="w-full px-3 py-2 border border-input rounded-md" required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Phone</label>
+                <input type="tel" name="customer_phone" required class="w-full px-3 py-2 border border-input rounded-md">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Number of People</label>
+                <input type="number" name="quantity" min="1" value="1" required class="w-full px-3 py-2 border border-input rounded-md">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-1">Preferred Date</label>
+                <input type="date" name="booking_date" required class="w-full px-3 py-2 border border-input rounded-md">
+            </div>
+
+            <button type="submit" class="w-full bg-hero-gradient text-white py-3 rounded-md hover:opacity-90 transition-opacity">
+                Confirm Booking
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openBookingModal() {
+        document.getElementById('bookingSuccess').classList.add('hidden');
+        document.getElementById('bookingModal').classList.remove('hidden');
+        document.getElementById('bookingModal').classList.add('flex');
+    }
+
+    function closeBookingModal() {
+        document.getElementById('bookingModal').classList.add('hidden');
+        document.getElementById('bookingModal').classList.remove('flex');
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const formData = new FormData(this);
+        formData.append('action', 'create_booking');
+
+        fetch(ajax_object.ajax_url, {
+                method: 'POST',
+                body: formData,
+            })
+            .then(response => response.json())
+            .then(data => {
+                // console.log(data);
+                if (data.success) {
+                    document.getElementById('bookingSuccess').classList.remove('hidden');
+                    document.getElementById('bookingSuccess').innerHTML = data.data.message;
+
+                    setTimeout(() => {
+                        closeBookingModal();
+                    }, 5000);
+                    // window.location.href = data.redirect;
+                } else {
+                    alert(data.message || 'Something went wrong. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Something went wrong. Please try again.');
+            });
+    });
+</script>
 <?php get_footer(); ?>

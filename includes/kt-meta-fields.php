@@ -76,6 +76,12 @@ class Kt_meta_fields
                 <textarea name="kt_tour_highlights" id="kt_tour_highlights" class="widefat" placeholder="example1, example2"><?php echo get_post_meta(get_the_ID(), 'kt_tour_highlights', true) ?: ''; ?> </textarea>
             </div>
         </div>
+        <div>
+            <h4>Location</h4>
+            <div>
+                <input type="text" name="kt_location" id="kt_location" placeholder="Kathmandu, Nepal" class="widefat" value="<?php echo get_post_meta(get_the_ID(), 'kt_location', true) ?: ''; ?>" required>
+            </div>
+        </div>
 <?php
     }
 
@@ -107,6 +113,9 @@ class Kt_meta_fields
         }
         if (isset($_POST['kt_ages'])) {
             update_post_meta($post_id, 'kt_ages', $_POST['kt_ages']);
+        }
+        if (isset($_POST['kt_location'])) {
+            update_post_meta($post_id, 'kt_location', $_POST['kt_location']);
         }
     }
 }
